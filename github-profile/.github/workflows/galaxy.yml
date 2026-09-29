@@ -1,0 +1,38 @@
+name: Update Contribution Galaxy
+
+on:
+  schedule:
+    # Run once daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'generate_galaxy.py'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-galaxy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate Contribution Galaxy SVG
+        run: |
+          python generate_galaxy.py SamSurve assets/contribution-galaxy.svg
+
+      - name: Commit and Push if Changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add assets/contribution-galaxy.svg
+          git diff --staged --quiet || (git commit -m "🌌 Update Contribution Galaxy [skip ci]" && git push)
