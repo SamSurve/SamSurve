@@ -6,10 +6,19 @@
 ![](https://streak-stats.demolab.com/?user=SamSurve&theme=dark&hide_border=false)<br/>
 ![](https://github-readme-stats.shion.dev/api/top-langs/?username=SamSurve&theme=dark&hide_border=false&include_all_commits=true&count_private=false&layout=compact)
 
-<!-- Snake Game Repo View -->
+<!-- 🌌 GitHub Contribution Galaxy -->
 
 <div align="center">
-  <img src="https://profile-readme-generator.com/assets/snake.svg" alt="Snake animation" />
+  <picture>
+    <source
+      media="(prefers-reduced-motion: reduce)"
+      srcset="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet-reduced.svg"
+    />
+    <img
+      src="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet.svg"
+      alt="GitHub Contribution Galaxy"
+    />
+  </picture>
 </div>
 
 ## 🏆 GitHub Trophies
