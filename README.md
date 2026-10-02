@@ -9,16 +9,10 @@
 <!-- 🌌 GitHub Contribution Galaxy -->
 
 <div align="center">
-  <picture>
-    <source
-      media="(prefers-reduced-motion: reduce)"
-      srcset="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet-reduced.svg"
-    />
-    <img
-      src="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet.svg"
-      alt="GitHub Contribution Galaxy"
-    />
-  </picture>
+  <img
+    src="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet.svg"
+    alt="GitHub Contribution Galaxy"
+  />
 </div>
 
 ## 🏆 GitHub Trophies
