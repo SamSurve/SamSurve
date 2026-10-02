@@ -16,3 +16,16 @@ jobs:
         with:
           username: SamSurve
           layout: grid
+
+      - name: Make Galaxy Blue Purple
+        run: |
+          sed -i 's/#ffd700/#00d9ff/g; s/#ff8c00/#7c3aed/g; s/#ffff00/#00aaff/g' comet-graph/comet.svg
+          sed -i 's/#ffd700/#00d9ff/g; s/#ff8c00/#7c3aed/g; s/#ffff00/#00aaff/g' comet-graph/comet-reduced.svg
+
+      - name: Commit Galaxy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update galaxy colors" || exit 0
+          git push
