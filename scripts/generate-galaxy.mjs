@@ -111,7 +111,7 @@ function render(weeksIn) {
   const cells = [];
   for (let i = 0; i < weeks.length; i++) {
     for (const d of weeks[i]) cells.push({
-      ...d, col: i + offset, row: d.weekday
+      ...d, col: i + offset, row: d.weekday - 1
     });
   }
 
