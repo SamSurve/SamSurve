@@ -6,14 +6,6 @@
 ![](https://streak-stats.demolab.com/?user=SamSurve&theme=dark&hide_border=false)<br/>
 ![](https://github-readme-stats.shion.dev/api/top-langs/?username=SamSurve&theme=dark&hide_border=false&include_all_commits=true&count_private=false&layout=compact)
 
-<!-- 🌌 GitHub Contribution Galaxy -->
-
-<div align="center">
-  <img
-    src="assets/contribution-galaxy.svg"
-    alt="GitHub Contribution Galaxy"
-  />
-</div>
 
 ## 🏆 GitHub Trophies
 ![](https://github-profile-trophy.vercel.app/?username=SamSurve&theme=radical&no-frame=false&no-bg=true&margin-w=4)
