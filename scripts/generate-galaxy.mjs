@@ -4,8 +4,8 @@
  * Node 18+, zero npm dependencies.
  *
  * Fetches the real contribution calendar from GitHub GraphQL and renders
- * a self-contained 896x150 SVG. The workflow passes GITHUB_TOKEN and
- * writes assets/contribution-galaxy.svg.
+ * a self-contained SVG that keeps GitHub's 53x7 contribution geometry,
+ * but presents the activity as a clean blue/cyan/purple space field.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname } from "node:path";
@@ -21,17 +21,20 @@ const OUT = getArg("out", "assets/contribution-galaxy.svg");
 const INPUT = getArg("input", null);
 
 const W = 896;
-const H = 166;
+const H = 172;
 const COLS = 53;
 const ROWS = 7;
 const PITCH = 16;
 const CELL = 12.4;
-const GRID_W = (COLS - 1) * PITCH + CELL;
-const GRID_H = (ROWS - 1) * PITCH + CELL;
 const X0 = 42;
-const Y0 = 24;
+const Y0 = 30;
 
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const esc = (s) => String(s)
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;");
+
 const n = (v) => Math.round(v * 100) / 100;
 
 function hash(s) {
@@ -55,24 +58,32 @@ function rng(seed) {
 }
 
 const ramp = [
-  [0, "#0b1226"], [1, "#1b3aa8"], [2, "#2246c4"], [3, "#2563eb"],
-  [5, "#3b82f6"], [6, "#1fb6f0"], [10, "#3fdcf7"],
-  [11, "#7c5cf6"], [16, "#a45bf7"], [22, "#d8bcff"], [28, "#ffffff"]
+  [0.00, "#07101e"],
+  [0.12, "#10275b"],
+  [0.28, "#1c4ed8"],
+  [0.45, "#2491ff"],
+  [0.62, "#2dd4f7"],
+  [0.78, "#7b61ff"],
+  [0.90, "#b58cff"],
+  [1.00, "#f2eaff"]
 ];
 
 const hex = (x) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16));
-const colorMix = (a, b, t) => {
-  const A = hex(a), B = hex(b);
-  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join("");
-};
 
-function colorFor(count) {
-  if (count <= 0) return ramp[0][1];
+function colorMix(a, b, t) {
+  const A = hex(a), B = hex(b);
+  return "#" + A.map((v, i) =>
+    Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")
+  ).join("");
+}
+
+function colorAt(t) {
+  t = Math.max(0, Math.min(1, t));
   for (let i = 1; i < ramp.length; i++) {
-    if (count <= ramp[i][0]) {
-      const [c0, a,] = ramp[i - 1];
-      const [c1, b] = ramp[i];
-      return colorMix(a, b, (count - c0) / (c1 - c0));
+    const [p1, c1] = ramp[i];
+    if (t <= p1) {
+      const [p0, c0] = ramp[i - 1];
+      return colorMix(c0, c1, (t - p0) / (p1 - p0));
     }
   }
   return ramp.at(-1)[1];
@@ -80,6 +91,7 @@ function colorFor(count) {
 
 async function fetchCalendar(token) {
   const query = `query($login:String!){user(login:$login){contributionsCollection{contributionCalendar{weeks{contributionDays{date contributionCount weekday}}}}}}`;
+
   const res = await fetch("https://api.github.com/graphql", {
     method: "POST",
     headers: {
@@ -87,146 +99,216 @@ async function fetchCalendar(token) {
       "Content-Type": "application/json",
       "User-Agent": "SamSurve-contribution-galaxy"
     },
-    body: JSON.stringify({ query, variables: { login: USER } })
+    body: JSON.stringify({
+      query,
+      variables: { login: USER }
+    })
   });
+
   if (!res.ok) throw new Error(`GraphQL HTTP ${res.status}`);
+
   const json = await res.json();
   const weeks = json?.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
   if (!weeks) throw new Error("No contribution calendar returned");
-  return weeks.map(w => w.contributionDays.map(d => ({
-    date: d.date, count: d.contributionCount, weekday: d.weekday
+
+  return weeks.map((w) => w.contributionDays.map((d) => ({
+    date: d.date,
+    count: d.contributionCount,
+    weekday: d.weekday
   })));
 }
 
 async function loadCalendar() {
   if (INPUT) return JSON.parse(readFileSync(INPUT, "utf8"));
+
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   if (!token) throw new Error("GITHUB_TOKEN is required");
+
   return fetchCalendar(token);
 }
 
 function render(weeksIn) {
   const weeks = weeksIn.filter(Boolean).slice(-COLS);
   const offset = COLS - weeks.length;
+
   const cells = [];
   for (let i = 0; i < weeks.length; i++) {
-    for (const d of weeks[i]) cells.push({
-      ...d, col: i + offset, row: d.weekday - 1
-    });
+    for (const d of weeks[i]) {
+      cells.push({
+        ...d,
+        col: i + offset,
+        // GitHub GraphQL weekday is 1..7 (Mon..Sun).
+        // SVG rows are 0..6.
+        row: d.weekday - 1
+      });
+    }
   }
 
-  // GitHub-style weekday and month labels, derived from the actual calendar dates.
+  const active = cells.filter((c) => c.count > 0);
+  const max = Math.max(1, ...active.map((c) => c.count));
+
+  const cx = (c) => X0 + c.col * PITCH + CELL / 2;
+  const cy = (c) => Y0 + c.row * PITCH + CELL / 2;
+
+  // Labels are derived from the same real calendar data.
   const weekdayLabels = [
-    [1, "Mon"], [3, "Wed"], [5, "Fri"]
+    [1, "Mon"],
+    [3, "Wed"],
+    [5, "Fri"]
   ];
+
   const weekdayText = weekdayLabels.map(([row, label]) =>
-    `<text x="0" y="${n(Y0 + row * PITCH + CELL * 0.78)}" fill="#64748b" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${label}</text>`
+    `<text x="0" y="${n(Y0 + row * PITCH + 9)}" fill="#68758a" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${label}</text>`
   ).join("");
 
-  const monthFmt = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" });
+  const monthFmt = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: "UTC"
+  });
+
   const monthLabels = [];
   let lastMonth = "";
-  for (const w of weeks) {
+  weeks.forEach((w, i) => {
     const first = w?.[0];
-    if (!first) continue;
+    if (!first) return;
+
     const month = monthFmt.format(new Date(first.date + "T00:00:00Z"));
-    const col = weeks.indexOf(w) + offset;
     if (month !== lastMonth) {
-      const tx = X0 + col * PITCH;
-      monthLabels.push(`<text x="${n(tx)}" y="12" fill="#64748b" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${month}</text>`);
+      const x = X0 + (i + offset) * PITCH;
+      monthLabels.push(
+        `<text x="${n(x)}" y="13" fill="#68758a" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${month}</text>`
+      );
       lastMonth = month;
     }
-  }
-  const labels = weekdayText + monthLabels.join("");
+  });
 
-  const max = Math.max(1, ...cells.map(c => c.count));
-  const active = cells.filter(c => c.count > 0);
-  const cx = c => X0 + c.col * PITCH + CELL / 2;
-  const cy = c => Y0 + c.row * PITCH + CELL / 2;
-
+  // Background star field: intentionally sparse so it never looks like fake data.
   const dust = [];
-  const r = rng(hash(`dust:${USER}`));
-  for (let i = 0; i < 115; i++) {
-    dust.push(`<circle cx="${n(r()*W)}" cy="${n(r()*H)}" r="${n(.25+r()*.75)}" fill="${r()>.55?"#6ee7ff":"#8b5cf6"}" opacity="${n(.08+r()*.22)}"/>`);
+  const dustRng = rng(hash(`dust:${USER}`));
+  for (let i = 0; i < 62; i++) {
+    const x = 8 + dustRng() * (W - 16);
+    const y = 18 + dustRng() * (H - 26);
+    const r = 0.25 + dustRng() * 0.7;
+    const fill = dustRng() > 0.5 ? "#69ddff" : "#a98cff";
+    dust.push(
+      `<circle cx="${n(x)}" cy="${n(y)}" r="${n(r)}" fill="${fill}" opacity="${n(0.08 + dustRng() * 0.16)}"/>`
+    );
   }
 
-  const empty = Array.from({ length: COLS }, (_, col) =>
-    Array.from({ length: ROWS }, (_, row) =>
-      `<rect x="${n(X0 + col * PITCH)}" y="${n(Y0 + row * PITCH)}" width="${CELL}" height="${CELL}" rx="2.6" fill="#0b1226"/>`
-    ).join("")
-  ).join("");
-  const nebula = [];
+  // A very soft space haze behind the grid. It does not alter contribution cells.
+  const haze = [
+    `<ellipse cx="746" cy="84" rx="220" ry="74" fill="url(#cyanHaze)" opacity=".15"/>`,
+    `<ellipse cx="836" cy="88" rx="126" ry="70" fill="url(#violetHaze)" opacity=".14"/>`
+  ].join("");
+
+  // Every empty day is explicitly drawn, preventing renderer-specific white grids.
+  const empty = [];
+  for (let col = 0; col < COLS; col++) {
+    for (let row = 0; row < ROWS; row++) {
+      empty.push(
+        `<rect x="${n(X0 + col * PITCH)}" y="${n(Y0 + row * PITCH)}" width="${CELL}" height="${CELL}" rx="2.8" fill="#07101e" stroke="#0e1a31" stroke-width=".45"/>`
+      );
+    }
+  }
+
   const glow = [];
-  const cellsOut = [];
+  const visible = [];
   const particles = [];
   const sparkles = [];
-  const lines = [];
 
-  for (let col = 0; col < COLS; col += 2) {
-    for (let row = 0; row < ROWS; row += 2) {
-      let energy = 0;
-      for (const c of active) {
-        const d = Math.hypot(c.col - col, c.row - row);
-        if (d < 5) energy += ((1 - d / 5) ** 2) * Math.sqrt(c.count);
-      }
-      if (energy > .35) {
-        nebula.push(`<circle cx="${n(X0+col*PITCH+CELL/2)}" cy="${n(Y0+row*PITCH+CELL/2)}" r="${n(20+Math.min(energy,6)*6)}" fill="url(#${energy>3?"violet":"cyan"})" opacity="${n(Math.min(.28,.06+energy*.035))}"/>`);
-      }
-    }
-  }
-
-  const strong = active.filter(c => c.count >= 5);
-  for (let i=0;i<strong.length;i++) for (let j=i+1;j<strong.length;j++) {
-    const a=strong[i], b=strong[j], d=Math.hypot(a.col-b.col,a.row-b.row);
-    if (d <= 2.2) lines.push(`<line x1="${n(cx(a))}" y1="${n(cy(a))}" x2="${n(cx(b))}" y2="${n(cy(b))}"/>`);
-  }
-
-  for (const c of cells) {
+  for (const c of active) {
     const x = X0 + c.col * PITCH;
     const y = Y0 + c.row * PITCH;
-    if (!c.count) continue;
-    const col = colorFor(c.count);
-    const intensity = Math.min(1, c.count / max);
-    glow.push(`<rect x="${n(x)}" y="${n(y)}" width="${CELL}" height="${CELL}" rx="3" fill="${c.count>=11?"#8b5cf6":"#2f6df0"}" opacity="${n(.26+intensity*.6)}"/>`);
-    cellsOut.push(`<rect x="${n(x)}" y="${n(y)}" width="${CELL}" height="${CELL}" rx="2.6" fill="${col}"/>`);
+    const intensity = Math.sqrt(c.count / max);
+    const fill = colorAt(c.count / max);
+
+    // Contribution cell glow.
+    glow.push(
+      `<rect x="${n(x)}" y="${n(y)}" width="${CELL}" height="${CELL}" rx="3.5" fill="${fill}" opacity="${n(0.32 + intensity * 0.46)}"/>`
+    );
+
+    visible.push(
+      `<rect x="${n(x)}" y="${n(y)}" width="${CELL}" height="${CELL}" rx="2.8" fill="${fill}"/>`
+    );
+
+    // Tiny center bloom for medium/high activity.
     if (c.count >= 3) {
-      cellsOut.push(`<circle cx="${n(cx(c))}" cy="${n(cy(c))}" r="${n(1.7+intensity*3.8)}" fill="url(#core)" opacity="${n(.5+intensity*.5)}"/>`);
+      visible.push(
+        `<circle cx="${n(cx(c))}" cy="${n(cy(c))}" r="${n(1.0 + intensity * 2.4)}" fill="#ffffff" opacity="${n(0.18 + intensity * 0.52)}"/>`
+      );
     }
-    const rr = rng(hash(`${c.date}:${c.count}`));
-    const particleCount = c.count >= 11 ? 5 : c.count >= 6 ? 3 : 2;
-    for (let i=0;i<particleCount;i++) {
-      const a=rr()*Math.PI*2, d=CELL+rr()*12;
-      particles.push(`<circle cx="${n(cx(c)+Math.cos(a)*d)}" cy="${n(cy(c)+Math.sin(a)*d*.7)}" r="${n(.3+rr()*.6)}" fill="${c.count>=11?"#c4a5ff":"#7fe3ff"}" opacity="${n(.45+rr()*.5)}"/>`);
+
+    // Only strong contribution cells get nearby particles.
+    if (c.count >= 4) {
+      const rr = rng(hash(`cell:${c.date}:${c.count}`));
+      const count = c.count >= 10 ? 4 : c.count >= 6 ? 3 : 1;
+
+      for (let i = 0; i < count; i++) {
+        const a = rr() * Math.PI * 2;
+        const d = 8 + rr() * 8;
+        particles.push(
+          `<circle cx="${n(cx(c) + Math.cos(a) * d)}" cy="${n(cy(c) + Math.sin(a) * d * 0.7)}" r="${n(0.3 + rr() * 0.5)}" fill="${c.count >= 10 ? "#c9b0ff" : "#82eaff"}" opacity="${n(0.35 + rr() * 0.4)}"/>`
+        );
+      }
     }
-    if (c.count >= 6) {
-      const s=2.5+intensity*3.6, k=s*.22, px=cx(c), py=cy(c);
-      sparkles.push(`<path class="tw" d="M${n(px)} ${n(py-s)}L${n(px+k)} ${n(py-k)}L${n(px+s)} ${n(py)}L${n(px+k)} ${n(py+k)}L${n(px)} ${n(py+s)}L${n(px-k)} ${n(py+k)}L${n(px-s)} ${n(py)}L${n(px-k)} ${n(py-k)}Z" fill="#fff"/>`);
+
+    if (c.count >= Math.max(6, Math.ceil(max * 0.6))) {
+      const s = 2.4 + intensity * 3.2;
+      const k = s * 0.22;
+      const px = cx(c), py = cy(c);
+
+      sparkles.push(
+        `<path class="tw" d="M${n(px)} ${n(py - s)}L${n(px + k)} ${n(py - k)}L${n(px + s)} ${n(py)}L${n(px + k)} ${n(py + k)}L${n(px)} ${n(py + s)}L${n(px - k)} ${n(py + k)}L${n(px - s)} ${n(py)}L${n(px - k)} ${n(py - k)}Z" fill="#ffffff"/>`
+      );
     }
   }
+
+  const labels = weekdayText + monthLabels.join("");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="GitHub contribution galaxy for ${esc(USER)}">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#02040a"/><stop offset=".5" stop-color="#040916"/><stop offset="1" stop-color="#02040a"/></linearGradient>
-  <radialGradient id="cyan"><stop stop-color="#22d3ee" stop-opacity=".6"/><stop offset="1" stop-color="#2563eb" stop-opacity="0"/></radialGradient>
-  <radialGradient id="violet"><stop stop-color="#8b5cf6" stop-opacity=".7"/><stop offset="1" stop-color="#5b21b6" stop-opacity="0"/></radialGradient>
-  <radialGradient id="core"><stop stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-  <linearGradient id="sheen"><stop stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
-  <pattern id="grid" width="${PITCH}" height="${PITCH}" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="${CELL}" height="${CELL}" rx="2.6" fill="#0b1226"/></pattern>
-  <filter id="blur6" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="6"/></filter>
-  <filter id="blur2" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="2.4"/></filter>
-  <style>.tw{transform-origin:center;transform-box:fill-box;animation:twinkle 3.8s ease-in-out infinite alternate}@keyframes twinkle{from{opacity:.45}to{opacity:1}}</style>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop stop-color="#02050d"/>
+    <stop offset=".48" stop-color="#050a17"/>
+    <stop offset="1" stop-color="#02050d"/>
+  </linearGradient>
+
+  <radialGradient id="cyanHaze">
+    <stop stop-color="#22d3ee" stop-opacity=".65"/>
+    <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+
+  <radialGradient id="violetHaze">
+    <stop stop-color="#8b5cf6" stop-opacity=".7"/>
+    <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+  </radialGradient>
+
+  <filter id="glow" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="3"/>
+  </filter>
+
+  <filter id="glowSoft" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="6"/>
+  </filter>
+
+  <style>
+    .tw{transform-origin:center;transform-box:fill-box;animation:twinkle 3.6s ease-in-out infinite alternate}
+    @keyframes twinkle{from{opacity:.48}to{opacity:1}}
+  </style>
 </defs>
-<rect width="${W}" height="${H}" rx="10" fill="url(#bg)"/>
-<g>${labels}</g>
+
+<rect width="${W}" height="${H}" rx="12" fill="url(#bg)"/>
+
 <g>${dust.join("")}</g>
-<g>${nebula.join("")}</g>
-<g>${empty}</g>
-<g stroke="#7fb0ff" stroke-opacity=".2" stroke-width=".6" stroke-linecap="round">${lines.join("")}</g>
-<g filter="url(#blur6)">${glow.join("")}</g>
-<g filter="url(#blur2)">${glow.map((x,i)=>i%2?x:"").join("")}</g>
-<g>${cellsOut.join("")}</g>
-<g opacity=".5">${cells.filter(c=>c.count>0).map(c=>`<rect x="${n(X0+c.col*PITCH)}" y="${n(Y0+c.row*PITCH)}" width="${CELL}" height="${CELL}" rx="2.6" fill="url(#sheen)"/>`).join("")}</g>
+<g>${haze}</g>
+<g>${labels}</g>
+<g>${empty.join("")}</g>
+
+<g filter="url(#glowSoft)" opacity=".42">${glow.join("")}</g>
+<g filter="url(#glow)" opacity=".58">${glow.join("")}</g>
+
+<g>${visible.join("")}</g>
 <g>${particles.join("")}</g>
 <g>${sparkles.join("")}</g>
 </svg>`;
@@ -235,14 +317,19 @@ function render(weeksIn) {
 try {
   const weeks = await loadCalendar();
   const svg = render(weeks);
+
   mkdirSync(dirname(OUT), { recursive: true });
   writeFileSync(OUT, svg);
+
   console.log(`[galaxy] wrote ${OUT} (${svg.length} bytes)`);
 } catch (error) {
   console.warn(`[galaxy] ${error.message}`);
+
+  // Never destroy a known-good asset on a transient API failure.
   if (existsSync(OUT)) {
     console.warn("[galaxy] keeping existing SVG");
     process.exit(0);
   }
+
   process.exit(1);
 }
