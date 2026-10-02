@@ -21,15 +21,15 @@ const OUT = getArg("out", "assets/contribution-galaxy.svg");
 const INPUT = getArg("input", null);
 
 const W = 896;
-const H = 150;
+const H = 166;
 const COLS = 53;
 const ROWS = 7;
 const PITCH = 16;
 const CELL = 12.4;
 const GRID_W = (COLS - 1) * PITCH + CELL;
 const GRID_H = (ROWS - 1) * PITCH + CELL;
-const X0 = Math.round(((W - GRID_W) / 2) * 10) / 10;
-const Y0 = Math.round(((H - GRID_H) / 2) * 10) / 10;
+const X0 = 42;
+const Y0 = 24;
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const n = (v) => Math.round(v * 100) / 100;
@@ -115,6 +115,30 @@ function render(weeksIn) {
     });
   }
 
+  // GitHub-style weekday and month labels, derived from the actual calendar dates.
+  const weekdayLabels = [
+    [1, "Mon"], [3, "Wed"], [5, "Fri"]
+  ];
+  const weekdayText = weekdayLabels.map(([row, label]) =>
+    `<text x="0" y="${n(Y0 + row * PITCH + CELL * 0.78)}" fill="#64748b" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${label}</text>`
+  ).join("");
+
+  const monthFmt = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" });
+  const monthLabels = [];
+  let lastMonth = "";
+  for (const w of weeks) {
+    const first = w?.[0];
+    if (!first) continue;
+    const month = monthFmt.format(new Date(first.date + "T00:00:00Z"));
+    const col = weeks.indexOf(w) + offset;
+    if (month !== lastMonth) {
+      const tx = X0 + col * PITCH;
+      monthLabels.push(`<text x="${n(tx)}" y="12" fill="#64748b" font-family="Arial,sans-serif" font-size="8" text-anchor="start">${month}</text>`);
+      lastMonth = month;
+    }
+  }
+  const labels = weekdayText + monthLabels.join("");
+
   const max = Math.max(1, ...cells.map(c => c.count));
   const active = cells.filter(c => c.count > 0);
   const cx = c => X0 + c.col * PITCH + CELL / 2;
@@ -194,6 +218,7 @@ function render(weeksIn) {
   <style>.tw{transform-origin:center;transform-box:fill-box;animation:twinkle 3.8s ease-in-out infinite alternate}@keyframes twinkle{from{opacity:.45}to{opacity:1}}</style>
 </defs>
 <rect width="${W}" height="${H}" rx="10" fill="url(#bg)"/>
+<g>${labels}</g>
 <g>${dust.join("")}</g>
 <g>${nebula.join("")}</g>
 <g>${empty}</g>
