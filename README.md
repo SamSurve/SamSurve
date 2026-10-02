@@ -1,4 +1,3 @@
-
 # 💻 Tech Stack:
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white) ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white) ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 # 📊 GitHub Stats:
@@ -10,7 +9,7 @@
 
 <div align="center">
   <img
-    src="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet.svg"
+    src="assets/contribution-galaxy.svg"
     alt="GitHub Contribution Galaxy"
   />
 </div>
