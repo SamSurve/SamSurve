@@ -126,7 +126,11 @@ function render(weeksIn) {
     dust.push(`<circle cx="${n(r()*W)}" cy="${n(r()*H)}" r="${n(.25+r()*.75)}" fill="${r()>.55?"#6ee7ff":"#8b5cf6"}" opacity="${n(.08+r()*.22)}"/>`);
   }
 
-  const empty = `<rect x="${X0}" y="${Y0}" width="${GRID_W}" height="${GRID_H}" fill="url(#grid)"/>`;
+  const empty = Array.from({ length: COLS }, (_, col) =>
+    Array.from({ length: ROWS }, (_, row) =>
+      `<rect x="${n(X0 + col * PITCH)}" y="${n(Y0 + row * PITCH)}" width="${CELL}" height="${CELL}" rx="2.6" fill="#0b1226"/>`
+    ).join("")
+  ).join("");
   const nebula = [];
   const glow = [];
   const cellsOut = [];
