@@ -10,7 +10,7 @@
 
 <div align="center">
   <img
-    src="assets/contribution-galaxy-v2.svg"
+    src="assets/contribution-galaxy.svg"
     alt="GitHub Contribution Galaxy"
   />
 </div>
