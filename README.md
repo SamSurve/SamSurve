@@ -10,7 +10,7 @@
 
 <div align="center">
   <img
-    src="https://raw.githubusercontent.com/SamSurve/SamSurve/comet-graph/comet.svg"
+    src="assets/contribution-galaxy.svg"
     alt="GitHub Contribution Galaxy"
   />
 </div>
