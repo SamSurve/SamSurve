@@ -3,7 +3,7 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:2563eb,100:7c3aed&height=180&section=header&text=SAM%20SURVE&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=35"/>
 
 <a href="https://github.com/SamSurve">
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student;Software+Developer;DSA+%7C+AI+%7C+Backend;Building+things+that+actually+work." />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student" />
 </a>
 
 </div>
@@ -38,13 +38,15 @@
 
 <div align="center">
 
-<div align="center">
+## 🌸 CONTRIBUTION UNIVERSE
 
-## 🌌 CONTRIBUTION UNIVERSE
-
-<img src="https://raw.githubusercontent.com/SamSurve/contribution-universe/main/universe.svg" width="100%" />
+<img src="https://raw.githubusercontent.com/SamSurve/contribution-universe/main/contribution-universe-sakura.png" width="100%" alt="SamSurve Contribution Universe"/>
 
 </div>
+
+---
+
+<div align="center">
 
 ## 🔗 CONNECT
 
