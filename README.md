@@ -40,7 +40,7 @@
 
 ## 🌸 CONTRIBUTION UNIVERSE
 
-<img src="https://raw.githubusercontent.com/SamSurve/contribution-universe/main/contribution-universe-sakura.png" width="100%" alt="SamSurve Contribution Universe"/>
+<img src="https://raw.githubusercontent.com/SamSurve/contribution-universe/main/universe.svg" width="100%" alt="SamSurve Sakura Contribution Universe"/>
 
 </div>
 
