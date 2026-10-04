@@ -38,15 +38,13 @@
 
 <div align="center">
 
+<div align="center">
+
 ## 🌌 CONTRIBUTION UNIVERSE
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=SamSurve&bg_color=0d1117&color=58a6ff&line=7c3aed&point=00e5ff&area=true&hide_border=true"/>
+<img src="https://raw.githubusercontent.com/SamSurve/contribution-universe/main/universe.svg" width="100%" />
 
 </div>
-
----
-
-<div align="center">
 
 ## 🔗 CONNECT
 
