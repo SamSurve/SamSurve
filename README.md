@@ -26,6 +26,26 @@
 
 <div align="center">
 
+---
+
+<div align="center">
+
+## 🚀 FEATURED PROJECTS
+
+<a href="YOUR_PROJECT_LINK">
+<img src="https://img.shields.io/badge/🌍%20EcoPulse%20Mumbai-Environmental%20Analytics-111827?style=for-the-badge"/>
+</a>
+
+<a href="YOUR_PROJECT_LINK">
+<img src="https://img.shields.io/badge/🤖%20CareerAI-AI%20Career%20Platform-111827?style=for-the-badge"/>
+</a>
+
+<a href="YOUR_PROJECT_LINK">
+<img src="https://img.shields.io/badge/🎵%20Music%20Downloader-Async%20Media%20Engine-111827?style=for-the-badge"/>
+</a>
+
+</div>
+
 ## 📊 GITHUB COMMAND CENTER
 
 <img width="49%" src="https://github-readme-stats.vercel.app/api?username=SamSurve&show_icons=true&theme=tokyonight&hide_border=true&rank_icon=github"/>
