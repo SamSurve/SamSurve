@@ -3,8 +3,12 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:2563eb,100:7c3aed&height=180&section=header&text=SAM%20SURVE&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=35"/>
 
 <a href="https://github.com/SamSurve">
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student;C%2B%2B+%7C+DSA+%7C+AIML" />
 </a>
+
+<br/>
+
+`LEARNING | IMPLEMENTING | FIXING | SHIPPING`
 
 </div>
 
