@@ -3,7 +3,7 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:2563eb,100:7c3aed&height=180&section=header&text=SAM%20SURVE&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=35"/>
 
 <a href="https://github.com/SamSurve">
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student;C%2B%2B+%7C+DSA+%7C+AIML" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=20&pause=1000&color=60A5FA&center=true&vCenter=true&width=650&lines=CSE+AIML+Student;C%2B%2B+%7C+DSA+%7C+AIML"/>
 </a>
 
 <br/>
@@ -26,34 +26,21 @@
 
 <div align="center">
 
----
+## 🐕 CONTRIBUTION DOGGO
 
-<div align="center">
-
-
-## 🐕 Contribution Doggo
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/SamSurve/contribution-doggo/output/contribution-doggo.gif" alt="My Contribution Doggo" width="100%">
-</p>
+<img src="https://raw.githubusercontent.com/SamSurve/contribution-doggo/output/contribution-doggo.gif" alt="My Contribution Doggo" width="100%"/>
 
 ## 📊 GITHUB COMMAND CENTER
 
 <img width="49%" src="https://github-readme-stats.vercel.app/api?username=SamSurve&show_icons=true&theme=tokyonight&hide_border=true&rank_icon=github"/>
+
 <img width="49%" src="https://github-readme-streak-stats.herokuapp.com/?user=SamSurve&theme=tokyonight&hide_border=true"/>
-
-<br/>
-
-<img width="49%" src="https://github-readme-stats.vercel.app/api/top-langs/?username=SamSurve&layout=compact&theme=tokyonight&hide_border=true"/>
-<img width="49%" src="https://github-profile-trophy.vercel.app/?username=SamSurve&theme=discord&no-frame=true&no-bg=true&row=2&column=4"/>
 
 </div>
 
 ---
 
 <div align="center">
-
-
 
 ## 🔗 CONNECT
 
