@@ -8,7 +8,7 @@
 
 <br/>
 
-`LEARNING | IMPLEMENTING `
+`LEARNING | IMPLEMENTING`
 
 </div>
 
