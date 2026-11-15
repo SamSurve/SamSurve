@@ -1,4 +1,3 @@
-
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:2563eb,100:7c3aed&height=180&section=header&text=SAM%20SURVE&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=35"/>
@@ -35,11 +34,7 @@
 
 ## 📊 GITHUB COMMAND CENTER
 
-<img width="49%" src="https://github-readme-stats.vercel.app/api?username=SamSurve&show_icons=true&theme=tokyonight&hide_border=true&rank_icon=github"/><img width="49%" src="https://github-readme-streak-stats.herokuapp.com/?user=SamSurve&theme=tokyonight&hide_border=true"/>
-
-<br/><br/>
-
-<img width="95%" src="https://github-readme-activity-graph.vercel.app/graph?username=SamSurve&theme=tokyo-night&hide_border=true&area=true"/>
+<img width="60%" src="https://github-readme-streak-stats.herokuapp.com/?user=SamSurve&theme=tokyonight&hide_border=true"/>
 
 </div>
 
